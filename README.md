@@ -1,4 +1,4 @@
-# cs370 Term Project
+# CS370 Term Project 2024
 # Authors
 Taylor Foulk
 Michael Barbella
