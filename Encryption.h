@@ -4,6 +4,7 @@
 char *encrypt(char *FileContents, char *key) {
   char *temp;
   char *result;
+  double difference;
 
   strcpy (temp, "");
   
@@ -15,9 +16,16 @@ char *encrypt(char *FileContents, char *key) {
       strcat (result, shuffle(temp));
       strcpy (temp, "");
     }
+    difference = i;
   }
-
-  for (int i; i < 
+  int i = difference;
+  
+  while (i % 10 != 9) {
+    i++;
+    strcat(temp, "X" + key[i % strlen(key)]);
+  }    
+  strcat (result, shuffle(temp));
+  return result;  
 }
 
 char *shuffle(char *input) {
@@ -38,5 +46,13 @@ char *shuffle(char *input) {
 }
 
 char *decrypt(char *FileContents, char *key) {
-
+  for (int i; i < strlen(FileContents); i++) {
+    if (i % 10 != 9) {
+      strcat (temp, FileContents[i] + key[i % strlen(key)];
+    } else {
+      strcat (temp, FileContents[i] + key[i % strlen(key)];
+      strcat (result, shuffle(temp));
+      strcpy (temp, "");
+    }
+  }
 }
