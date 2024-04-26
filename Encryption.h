@@ -11,6 +11,7 @@ char *encrypt(char *FileContents, char *key) {
     if (i % 10 != 9) {
       strcat (temp, FileContents[i] + key[i % strlen(key)];
     } else {
+      strcat (temp, FileContents[i] + key[i % strlen(key)];
       strcat (result, shuffle(temp));
       strcpy (temp, "");
     }
