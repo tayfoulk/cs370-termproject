@@ -3,6 +3,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+char *encrpypt(char*, char*);
+void append(char*, char);
+char shiftKeyUp(char, char);
+char shiftKeyDown(char, char);
+char *shuffle(char *);
+char *decrypt(char *, char*);
+
+
 char *encrypt(char *FileContents, char *key) {
   char *temp;
   char *result;
