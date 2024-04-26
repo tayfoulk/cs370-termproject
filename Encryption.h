@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 char *encrypt(char *FileContents, char *key) {
   char *temp;
