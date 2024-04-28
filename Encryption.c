@@ -39,7 +39,8 @@ char *encrypt(char *FileContents, char *key) {
 }
 
 char* append(char *input, char add) {
-    char *temp = malloc(sizeof(char) * (strlen(input) + 2));
+  
+  char *temp = malloc(sizeof(char) * (strlen(input) + 2));
     strcpy (temp, input);
     temp[strlen(input)] = add;
     temp[strlen(input) + 1] = '\0';
@@ -97,7 +98,8 @@ char *decrypt(char *FileContents, char *key) {
       temp = shuffle(temp);
 
       for (int j = 0; j < 10; j++) {
-        temp2 = append(temp2, shiftKeyDown(temp[j], key[(pos + j) % strlen(key)]));
+        letter = shiftKeyDown(temp[j], key[(pos + j) % strlen(key)]);
+        if (letter != '~') temp2 = append(temp2, letter);
       }
       pos+=10;
 
