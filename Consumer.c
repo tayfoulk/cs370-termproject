@@ -24,7 +24,7 @@ int main (int argc, char *argv[]) {
 
     encrypted = decrypt(encrypted, argv[3]);
 
-    uint32_t hash[5];
+    char* hash;
 
     sha1(encrypted, hash);
 
@@ -33,7 +33,7 @@ int main (int argc, char *argv[]) {
 
     *answer = 0;
 
-    if (hash == hash) { // change second has to hash pulled from argv
+    if (strcmp(hash, argv[4])) {
         *answer = 1;
     }
 
