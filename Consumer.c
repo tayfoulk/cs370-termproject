@@ -1,4 +1,8 @@
 #include <stdio.h>
+//shared memory
+#include <sys/shm.h>
+#include <unistd.h>
+#include <stdint.h>
 #include "Encryption.h"
 #include "sha1.h"
 
@@ -28,7 +32,7 @@ int main (int argc, char *argv[]) {
 
     sha1(encrypted, hash);
 
-    read(fd, &shmid, sizeof(shmid));
+    uint32_t valread=read(fd, &shmid, sizeof(shmid));
     answer = (int*)shmat(shmid, NULL, 0);
 
     *answer = 0;
