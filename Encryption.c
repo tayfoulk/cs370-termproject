@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 char *encrpypt(char*, char*);
-void append(char*, char);
+char* append(char*, char);
 char shiftKeyUp(char, char);
 char shiftKeyDown(char, char);
 char *shuffle(char *);
@@ -12,93 +12,115 @@ char *decrypt(char *, char*);
 
 
 char *encrypt(char *FileContents, char *key) {
-  char *temp;
-  char *result;
-  double difference;
+  char *temp = malloc(sizeof(char));
+  char *result = malloc(sizeof(char) * (strlen(FileContents) + 10));
+  int difference;
   char letter;
 
   strcpy (temp, "");
-  
-  for (int i; i < strlen(FileContents); i++) {
-    letter = shiftKeyUp(FileContents[i], key[i % strlen(key)]);
-    append (temp, letter);
+
+
+  for (int i = 0; i < strlen(FileContents); i++) {
+    letter = shiftKeyUp(FileContents[i], key[(i % strlen(key))]);
+    temp = append (temp, letter);
 
     if (i % 10 == 9) {
       strcat (result, shuffle(temp));
+
+      free(temp);
+      temp = malloc(sizeof(char));
       strcpy (temp, "");
     }
-    
+
     difference = i;
   }
-  
+
   int i = difference;
-  
+
+
   while (i % 10 != 9) {
+    letter = shiftKeyUp('~', key[(1 + i) % strlen(key)]);
+    temp = append(temp, letter);
     i++;
-    letter = shiftKeyUp('x', key[i % strlen(key)]);
-    append(temp, letter);
-  }    
-  
+
+  }
+
   strcat (result, shuffle(temp));
-  return result;  
+  return result;
 }
 
-void append(char *input, char add) {
-    char *temp = (char *) malloc(sizeof(char) * (strlen(input) + 1));
-    for (int i = 0; i < strlen(input); i ++) {
-        temp[i] = input[i];
-    }
+char* append(char *input, char add) {
+    char *temp = malloc(sizeof(char) * (strlen(input) + 2));
+    strcpy (temp, input);
     temp[strlen(input)] = add;
+    temp[strlen(input) + 1] = '\0';
+
     free(input);
-    input = temp;
+    return temp;
 }
 
 char *shuffle(char *input) {
-  char *temp;
+  char *temp = malloc(sizeof(char) * 10);
   strcpy (temp, "");
 
-  append(temp, input[7]);
-  append(temp, input[3]);
-  append(temp, input[2]);
-  append(temp, input[1]);
-  append(temp, input[8]);
-  append(temp, input[6]);
-  append(temp, input[5]);
-  append(temp, input[0]);
-  append(temp, input[4]);
-  append(temp, input[9]);
-  
+  temp = append(temp, input[7]);
+  temp = append(temp, input[3]);
+  temp = append(temp, input[9]);
+  temp = append(temp, input[1]);
+  temp = append(temp, input[8]);
+  temp = append(temp, input[6]);
+  temp = append(temp, input[5]);
+  temp = append(temp, input[0]);
+  temp = append(temp, input[4]);
+  temp = append(temp, input[2]);
+
   return temp;
 }
 
 char shiftKeyUp(char input, char key) {
-  return 32 + (((input + key) - 32) % 94);
+  return 32 + (((input + key) - 64) % 95);
 }
 
 char shiftKeyDown(char input, char key) {
-  int temp = input - key - 32;
+
+  int temp = input - key;
 
   if (temp < 0) {
-    temp += 94;
+    temp += 95;
   }
-  
-  return 32 + temp;
+  return (char)(32 + temp);
 }
 
 char *decrypt(char *FileContents, char *key) {
-  char *temp;
-  char *result;
+  char *temp = malloc(sizeof(char));
+  char *temp2 = malloc(sizeof(char));
+  char *result = malloc(sizeof(char) * (strlen(FileContents) + 10));
   char letter;
+  int pos = 0;
 
   strcpy (temp, "");
-  
-  for (int i; i < strlen(FileContents); i++) {
-    letter = shiftKeyDown(FileContents[i], key[i % strlen(key)]);
-    append (temp, letter);
+  strcpy (temp2, "");
+
+  for (int i = 0; i < strlen(FileContents); i++) {
+    temp = append (temp, FileContents[i]);
 
     if (i % 10 == 9) {
-      strcat (result, shuffle(temp));
+      temp = shuffle(temp);
+
+      for (int j = 0; j < 10; j++) {
+        temp2 = append(temp2, shiftKeyDown(temp[j], key[(pos + j) % strlen(key)]));
+      }
+      pos+=10;
+
+
+      strcat (result, temp2);
+
+      free(temp);
+      free(temp2);
+      temp = malloc(sizeof(char));
+      temp2 = malloc(sizeof(char));
       strcpy (temp, "");
+      strcpy (temp2, "");
     }
   }
   return result;
