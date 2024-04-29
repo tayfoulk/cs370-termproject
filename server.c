@@ -6,6 +6,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "socket_conn.h"
+#include "Encryption.h"
+#include "sha1.h"
+#include "convert.h"
 char* read_file(FILE* file, int* flen){
 	fseek(file, 0L, SEEK_END);
 	//save file size to flen address
@@ -47,6 +50,11 @@ int main(int argc, char **argv){
 	//read file contents
 	char* filedat=open_read_close(argv[1], &flen);
 	char filesize[8];
+	//get hash and convert to string
+	uint32_t myhash[5];
+	char hash_str[128];
+	sha1(filedat, myhash);
+	ui32_to_char(myhash, hash_str);
 	//convert flen to char pointer
 	sprintf(filesize, "%d", flen);
 	//set up client connection
@@ -55,15 +63,13 @@ int main(int argc, char **argv){
 	int c_socket=connectClient(s_socket);
 	//first send over file size
 	send(c_socket, filesize, 8, 0);
-	//then send file contents
+	//encrypt file
+	encrypt(filedat, "idk what the key is");
+	//then send encrypted file contents
 	send(c_socket, filedat, flen+1, 0);
-	//now wait, compute file hash while waiting
-	//uint32_t myhash[5];
-	
-	
-	//not sure exactly what happens here
-	
-	
+	//finally send hash
+	send(c_socket, hash_str, 128, 0);
+	//await response from client...
 	//read result from client
 	int result;
 	uint32_t valread=read(c_socket, (char*)&result, sizeof(int));
