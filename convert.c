@@ -12,7 +12,7 @@ void char_to_ui32(char* str, uint32_t* hash){
 	for(int i=0; i<5; i++) hash[i]=converthelp.val[i];
 }
 //pass str of size 128 or above for safety
-//convert string to hash[5]
+//convert hash to string, ending in null character
 void ui32_to_char(uint32_t* hash, char* str){
 	union conversions converthelp;
 	for(int i=0; i<5; i++) converthelp.val[i]=hash[i];
