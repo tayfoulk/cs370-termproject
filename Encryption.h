@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-char *encrpypt(char*, char*);
+char *encrypt(char*, char*);
 char* append(char*, char);
 char shiftKeyUp(char, char);
 char shiftKeyDown(char, char);
