@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include "Encryption.h"
+#include "convert.h"
 #include "sha1.h"
 
 /*
@@ -27,17 +28,21 @@ int main (int argc, char *argv[]) {
     strcpy (encrypted, argv[2]);
 
     encrypted = decrypt(encrypted, argv[3]);
-
-    char* hash;
+    //hold hash
+    uint32_t hash[5];
 
     sha1(encrypted, hash);
+    char hash_str[128];
+    //store hashval in hash_str
+    ui32_to_char(hash, hash_str);
 
     uint32_t valread=read(fd, &shmid, sizeof(shmid));
     answer = (int*)shmat(shmid, NULL, 0);
 
     *answer = 0;
-
-    if (strcmp(hash, argv[4])) {
+    
+    //compare hash_str to argv[4], the provided hash
+    if (strcmp(hash_str, argv[4])) {
         *answer = 1;
     }
 

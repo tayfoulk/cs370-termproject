@@ -2,7 +2,7 @@ CXX=gcc
 #-Os optimizes for size, important for raspberry pi
 CXXFLAGS=-Os
 #All dependencies for executables defined here
-DEPENDS=socket_conn.o sha1.o Encryption.o
+DEPENDS=socket_conn.o sha1.o Encryption.o convert.o
 
 #Main executables
 server: socket_conn.o server.c
@@ -21,6 +21,8 @@ Encryption.o: Encryption.c Encryption.h
 sha1.o: sha1.c sha1.h
 	$(CXX) $(CXXFLAGS) -c sha1.c
 
+convert.o: convert.c convert.h
+	$(CXX) $(CXXFLAGS) -c convert.c
 #Helper stuff
 package:
 	zip term_project.zip Makefile *.c *.h
