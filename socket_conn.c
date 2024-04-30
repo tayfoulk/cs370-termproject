@@ -46,6 +46,6 @@ int makeClientSocket(char* ipv4_addr){
 	//must be supplied with server IP address
 	inet_pton(AF_INET, ipv4_addr, &serverAddress.sin_addr);
 	//connect to server
-	connect(clientSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+	if(connect(clientSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress))==-1) return -1;
 	return clientSocket;
 }

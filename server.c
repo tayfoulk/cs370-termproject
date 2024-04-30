@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "socket_conn.h"
 #include "Encryption.h"
 #include "sha1.h"
@@ -13,7 +14,7 @@ char* read_file(FILE* file, int* flen){
 	fseek(file, 0L, SEEK_END);
 	//save file size to flen address
 	*flen=ftell(file);
-	char* data=(char*)malloc(*flen);
+	char* data=(char*)malloc((*flen)+1);
 	rewind(file);
 	//printf("%d\n", flen);
 	uint32_t valread=fread(data, sizeof(char), *flen, file);
@@ -49,33 +50,42 @@ int main(int argc, char **argv){
 	int flen;
 	//read file contents
 	char* filedat=open_read_close(argv[1], &flen);
+	//to delimit end of file
+	filedat[flen]='\0';
 	char filesize[8];
+	printf("File size: %d\n", flen);
 	//get hash and convert to string
 	uint32_t myhash[5];
 	char hash_str[128];
 	sha1(filedat, myhash);
 	ui32_to_char(myhash, hash_str);
-	//convert flen to char pointer
+	//encrypt file
+	char*encrypted=encrypt(filedat, "idkwhatthekeyis");
+	//printf("Encrypted contents:\n\n%s\n\n", encrypted);
+	//convert encrypted file length to char pointer
+	flen=(int)strlen(encrypted);
 	sprintf(filesize, "%d", flen);
 	//set up client connection
 	//this waits until client connects to server
 	int s_socket=makeServerSocket();
+	printf("Awaiting client connection...\n");
 	int c_socket=connectClient(s_socket);
-	//first send over file size
+	printf("Connected!\n");
+	//first send over encrypted file size
 	send(c_socket, filesize, 8, 0);
-	//encrypt file
-	encrypt(filedat, "idk what the key is");
 	//then send encrypted file contents
-	send(c_socket, filedat, flen+1, 0);
+	send(c_socket, encrypted, flen, 0);
 	//finally send hash
 	send(c_socket, hash_str, 128, 0);
 	//await response from client...
+	//(result is just a single char, since nothing more is needed
 	//read result from client
-	int result;
-	uint32_t valread=read(c_socket, (char*)&result, sizeof(int));
-	printf("Result: %d\n", result);
+	char result;
+	uint32_t valread=read(c_socket, &result, 1);
+	printf("Result: %c\n", result);
 	//cleanup
 	close(c_socket);
 	close(s_socket);
 	free(filedat);
+	free(encrypted);
 }

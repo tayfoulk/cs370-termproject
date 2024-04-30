@@ -5,10 +5,12 @@ CXXFLAGS=-Os
 DEPENDS=socket_conn.o sha1.o Encryption.o convert.o
 
 #Main executables
-server: socket_conn.o server.c
-	$(CXX) $(CXXFLAGS) socket_conn.o server.c -o server
+server: $(DEPENDS) server.c
+	$(CXX) $(CXXFLAGS) $(DEPENDS) server.c -o server
 client: socket_conn.o client.c
 	$(CXX) $(CXXFLAGS) socket_conn.o client.c -o client
+Producer: $(DEPENDS) Producer.c
+	$(CXX) $(CXXFLAGS) $(DEPENDS) Producer.c -o Producer
 Consumer: Consumer.c $(DEPENDS)
 	$(CXX) $(CXXFLAGS) $(DEPENDS) Consumer.c -o Consumer
 #Header compilation
