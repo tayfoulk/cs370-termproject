@@ -8,8 +8,8 @@
 int main (int argc, char *argv[]) {
     pid_t pid[4];
     int status;
-    int fd[argv[2]][2];
-    int shmid[argv[2]];
+    int fd[atoi(argv[2])][2];
+    int shmid[atoi(argv[2])];
 
     int c_socket = makeClientSocket(argv[1]);
 
@@ -39,10 +39,10 @@ int main (int argc, char *argv[]) {
             exit(-1);
         } else if (pid[i] == 0) {
             char buffer[8];
-            execlp("./Consumer", "Consumer", buffer, fileSplit(encryptedFile, i * segment, atoi(argv[2])) /* rfid call*/ , hash);
+            execlp("./Consumer", "Consumer", buffer, fileSplit(encryptedFile, i * segment, atoi(argv[2])) /* rfid call*/ , hash, NULL);
         } else {
             close(fd[i][0]);
-            shmid[i] = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666);
+            shmid[i] = shmget(IPC_PRIVATE, sizeof(char) * segment, IPC_CREAT | 0666);
             write (fd[i][1], &shmid[i], sizeof(shmid[i]));
             close(fd[i][1]);
             free(message);
@@ -53,8 +53,13 @@ int main (int argc, char *argv[]) {
     free(encryptedFile);
     free(key);
     
+    char *sharedMemory;
+    char *result = malloc(sizeof(char) * FileSize);
+    pid_t tempPID[4];
+    int pidFound = 0;
+    
     for (int i = 0; i < count; i++) {
-        tempPID[i]= wait(&status);
+        tempPID[i] = wait(&status);
 
         for (int j = 0; j <= i; j++) {
             if (tempPID[j] == pid[i]){
@@ -63,17 +68,25 @@ int main (int argc, char *argv[]) {
         }
 
         if (pidFound == 1){
-            sharedMemory = (int*)shmat(shmid[i], NULL, 0);
-
-            if (*sharedMemory == 0) {
-                failed(c_socket);
-            } 
-            
+            sharedMemory = (char*)shmat(shmid[i], NULL, 0);
+            strcat(result, sharedMemory);
             shmctl(*sharedMemory, IPC_RMID, NULL);
         }
         pidFound = 0;
     }
-    succeed(c_socket);
+
+    //hold hash
+    uint32_t hashU[5];
+
+    sha1(encrypted, hashU);
+    char hash_str[128];
+    
+    //store hashval in hash_str
+    ui32_to_char(hashU, hash_str);
+
+    if (strcmp(hash_str, hash)) succeed(c_socket);
+
+    failed (c_socket);
 }
 
 
