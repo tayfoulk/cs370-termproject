@@ -6,7 +6,6 @@ int main (int argc, char *argv[]) {
     int status;
     int fd[argv[2]][2];
     int shmid[argv[2]];
-    int i = 0;
 
     char *encryptedFile; // = file received from server
     char *key; // = key recieved from rfid reader
