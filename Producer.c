@@ -1,5 +1,9 @@
 #include "Producer.h"
 
+/* arguments
+1. IP address
+2. Number of threads
+*/
 
 int main (int argc, char *argv[]) {
     pid_t pid[4];
@@ -13,34 +17,42 @@ int main (int argc, char *argv[]) {
     char *key; // = key recieved from rfid reader
     char hash[128];
     int FileSize = 0;
+    char *message;
     
     read(c_socket, (int)FileSize, sizeof(int));
     encryptedFile = malloc(sizeof(char) * FileSize);
     read(c_socket, (char *)&encryptedFile, sizeof(char) * FileSize);
     read(c_socket, (char)hash, sizeof(char) * 128);
+
+    int segment = trunc(FileSize / atoi(argv[2]));
+    int count = 0;
     
     for (int i = 0; i < argv[2], i++;) {
+        message = fileSplit(encryptedFile, i * segment, atoi(argv[2]));
+        
+        if (i * segment >= FileSize) break;
+        
         pipe(fd[i]);
-
         pid[i] = fork();
 
         if (pid[i] < 0) {
             exit(-1);
         } else if (pid[i] == 0) {
             char buffer[8];
-            execlp("./Consumer", "Consumer", buffer, fileSplit(encryptedFile, i, argv[2])), /* rfid call*/ , hash);
+            execlp("./Consumer", "Consumer", buffer, fileSplit(encryptedFile, i * segment, atoi(argv[2])) /* rfid call*/ , hash);
         } else {
             close(fd[i][0]);
             shmid[i] = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666);
             write (fd[i][1], &shmid[i], sizeof(shmid[i]));
             close(fd[i][1]);
         }
+        count++;
     }
 
     free(encryptedFile);
     free(key);
     
-    for (int i = 0; i < argv[2]; i++) {
+    for (int i = 0; i < count; i++) {
         tempPID[i]= wait(&status);
 
         for (int j = 0; j <= i; j++) {
