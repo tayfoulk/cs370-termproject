@@ -20,7 +20,6 @@ int main (int argc, char *argv[]) {
 
     encrypted = decrypt(encrypted, argv[3]);
 
-
     uint32_t valread=read(fd, &shmid, sizeof(shmid));
     answer = (char*)shmat(shmid, NULL, 0);
 
