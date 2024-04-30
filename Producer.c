@@ -7,7 +7,7 @@ int main (int argc, char *argv[]) {
     int fd[argv[2]][2];
     int shmid[argv[2]];
 
-    char *encryptedFile; // = file received from server
+    char *encryptedFile; // = file received from server. IP address to receive from will be argv[1]
     char *key; // = key recieved from rfid reader
 
     for (int i = 0; i < argv[2], i++;) {
