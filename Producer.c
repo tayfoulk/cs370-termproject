@@ -7,6 +7,8 @@ int main (int argc, char *argv[]) {
     int fd[argv[2]][2];
     int shmid[argv[2]];
 
+    int c_socket = makeClientSocket(argv[1]);
+
     char *encryptedFile; // = file received from server. IP address to receive from will be argv[1]
     char *key; // = key recieved from rfid reader
 
@@ -41,9 +43,9 @@ int main (int argc, char *argv[]) {
             sharedMemory = (int*)shmat(shmid[i], NULL, 0);
 
             if (*sharedMemory == 0) {
-                failed();
+                failed(c_socket);
             } else {
-                succeed();
+                succeed(c_socket);
             }
             shmctl(*sharedMemory, IPC_RMID, NULL);
         }
