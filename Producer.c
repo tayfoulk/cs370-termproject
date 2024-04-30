@@ -28,10 +28,9 @@ int main (int argc, char *argv[]) {
     int count = 0;
     
     for (int i = 0; i < argv[2], i++;) {
-        message = fileSplit(encryptedFile, i * segment, atoi(argv[2]));
-        
         if (i * segment >= FileSize) break;
-        
+
+        message = fileSplit(encryptedFile, i * segment, atoi(argv[2]));        
         pipe(fd[i]);
         pid[i] = fork();
 
@@ -45,6 +44,7 @@ int main (int argc, char *argv[]) {
             shmid[i] = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666);
             write (fd[i][1], &shmid[i], sizeof(shmid[i]));
             close(fd[i][1]);
+            free(message);
         }
         count++;
     }
