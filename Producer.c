@@ -11,11 +11,13 @@ int main (int argc, char *argv[]) {
 
     char *encryptedFile; 
     char *key; // = key recieved from rfid reader
+    char hash[128];
     int FileSize = 0;
     
     read(c_socket, (int)FileSize, sizeof(int));
     encryptedFile = malloc(sizeof(char) * FileSize);
     read(c_socket, (char *)&encryptedFile, sizeof(char) * FileSize);
+    read(c_socket, (char)hash, sizeof(char) * 128);
     
     for (int i = 0; i < argv[2], i++;) {
         pipe(fd[i]);
@@ -26,7 +28,7 @@ int main (int argc, char *argv[]) {
             exit(-1);
         } else if (pid[i] == 0) {
             char buffer[8];
-            execlp("./Consumer", "Consumer", buffer, fileSplit(encryptedFile, i, argv[2])), // rfid call, // hash to compare);
+            execlp("./Consumer", "Consumer", buffer, fileSplit(encryptedFile, i, argv[2])), /* rfid call*/ , hash);
         } else {
             close(fd[i][0]);
             shmid[i] = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666);
@@ -35,6 +37,9 @@ int main (int argc, char *argv[]) {
         }
     }
 
+    free(encryptedFile);
+    free(key);
+    
     for (int i = 0; i < argv[2]; i++) {
         tempPID[i]= wait(&status);
 
@@ -64,6 +69,7 @@ char *fileSplit(char *input, int pos, int size) {
     char *result = malloc(sizeof(char) * segment);
 
     for (int i = pos; i < segment; i++) {
+        if (i >= strlen(input)) break;
         result[i - pos] = input[i];
     }
 
