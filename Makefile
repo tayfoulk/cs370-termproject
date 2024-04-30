@@ -9,9 +9,9 @@ server: $(DEPENDS) server.c
 	$(CXX) $(CXXFLAGS) $(DEPENDS) server.c -o server
 client: socket_conn.o client.c
 	$(CXX) $(CXXFLAGS) socket_conn.o client.c -o client
-Producer: $(DEPENDS) Producer.c
+Producer: $(DEPENDS) Producer.c Producer.h
 	$(CXX) $(CXXFLAGS) $(DEPENDS) Producer.c -o Producer
-Consumer: Consumer.c $(DEPENDS)
+Consumer: $(DEPENDS) Consumer.c Consumer.h
 	$(CXX) $(CXXFLAGS) $(DEPENDS) Consumer.c -o Consumer
 #Header compilation
 socket_conn.o: socket_conn.c socket_conn.h
