@@ -9,9 +9,14 @@ int main (int argc, char *argv[]) {
 
     int c_socket = makeClientSocket(argv[1]);
 
-    char *encryptedFile; // = file received from server. IP address to receive from will be argv[1]
+    char *encryptedFile; 
     char *key; // = key recieved from rfid reader
-
+    int FileSize = 0;
+    
+    read(c_socket, (int)FileSize, sizeof(int));
+    encryptedFile = malloc(sizeof(char) * FileSize);
+    read(c_socket, (char *)&encryptedFile, sizeof(char) * FileSize);
+    
     for (int i = 0; i < argv[2], i++;) {
         pipe(fd[i]);
 
@@ -44,13 +49,13 @@ int main (int argc, char *argv[]) {
 
             if (*sharedMemory == 0) {
                 failed(c_socket);
-            } else {
-                succeed(c_socket);
-            }
+            } 
+            
             shmctl(*sharedMemory, IPC_RMID, NULL);
         }
         pidFound = 0;
     }
+    succeed(c_socket);
 }
 
 
@@ -66,11 +71,13 @@ char *fileSplit(char *input, int pos, int size) {
 }
 
 void failed (int c_socket) {
-    // send failure code
+    send(c_socket, 0, sizeof(int), 0);
+    close(c_socket);
     exit (-1);
 }
 
 void success(int c_socket) {
-    // send success code
+    send(c_socket, 1, sizeof(int), 0);
+    close(c_socket);
     exit (0);
 }
