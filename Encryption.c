@@ -81,7 +81,7 @@ char shiftKeyDown(char input, char key) {
   return (char)(32 + temp);
 }
 
-char *decrypt(char *FileContents, char *key) {
+char *decrypt(char *FileContents, char *key, int offset) {
   char *temp = malloc(sizeof(char));
   char *temp2 = malloc(sizeof(char));
   char *result = malloc(sizeof(char) * (strlen(FileContents) + 10));
@@ -98,7 +98,7 @@ char *decrypt(char *FileContents, char *key) {
       temp = shuffle(temp);
 
       for (int j = 0; j < 10; j++) {
-        letter = shiftKeyDown(temp[j], key[(pos + j) % strlen(key)]);
+        letter = shiftKeyDown(temp[j], key[(offset + pos + j) % strlen(key)]);
         if (letter != '~') temp2 = append(temp2, letter);
       }
       pos+=10;
