@@ -38,7 +38,7 @@ char* open_read_close(const char* filename, int* flen){
 	1: filename
 	if this needs to be changed to work do so
 	
-	Reads a file, sends the raw file data over
+	Reads a file, sends the encrypted file data over
 	to the pi, then displays the result from the
 	raspberry pi.
 */
@@ -47,36 +47,42 @@ int main(int argc, char **argv){
 		printf("No filename provided. Ending execution\n");
 		return 1;
 	}
+	
 	int flen;
 	//read file contents
 	char* filedat=open_read_close(argv[1], &flen);
 	//to delimit end of file
 	filedat[flen]='\0';
 	char filesize[8];
-	printf("File size: %d\n", flen);
+	//printf("File size: %d\n", flen);
+	
 	//get hash and convert to string
 	uint32_t myhash[5];
 	char hash_str[128];
 	sha1(filedat, myhash);
 	ui32_to_char(myhash, hash_str);
+	
 	//encrypt file
 	char*encrypted=encrypt(filedat, "idkwhatthekeyis");
 	//printf("Encrypted contents:\n\n%s\n\n", encrypted);
 	//convert encrypted file length to char pointer
 	flen=(int)strlen(encrypted);
 	sprintf(filesize, "%d", flen);
+	
 	//set up client connection
 	//this waits until client connects to server
 	int s_socket=makeServerSocket();
 	printf("Awaiting client connection...\n");
 	int c_socket=connectClient(s_socket);
 	printf("Connected!\n");
+	
 	//first send over encrypted file size
 	send(c_socket, filesize, 8, 0);
 	//then send encrypted file contents
 	send(c_socket, encrypted, flen, 0);
 	//finally send hash
 	send(c_socket, hash_str, 128, 0);
+	
 	//await response from client...
 	//(result is just a single char, since nothing more is needed
 	//read result from client
