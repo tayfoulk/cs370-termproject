@@ -5,6 +5,39 @@
 2. Number of threads
 */
 
+char *fileSplit(char *input, int pos, int size) {
+    int segment = trunc(0.5 + (strlen(input) / size));
+    char *result = malloc(sizeof(char) * segment);
+
+    for (int i = pos; i < segment; i++) {
+        if (i >= strlen(input)) break;
+        result[i - pos] = input[i];
+    }
+
+    return (result);
+}
+
+void failed (int c_socket) {
+    int *message = malloc(sizeof(int));
+    *message = 0;
+
+    send(c_socket, message, sizeof(int), 0);
+    close(c_socket);
+    free(message);
+    exit (-1);
+}
+
+void succeed(int c_socket) {
+    int *message = malloc(sizeof(int));
+    *message = 1;
+
+    send(c_socket, message, sizeof(int), 0);
+    close(c_socket);
+    free(message);
+    exit (0);
+}
+
+
 int main (int argc, char *argv[]) {
     pid_t pid[4];
     int status;
@@ -15,21 +48,21 @@ int main (int argc, char *argv[]) {
 
     char *encryptedFile; 
     char *key; // = key recieved from rfid reader
-    char hash[128];
-    int FileSize = 0;
+    char *hash;
+    int* FileSize;
     char *message;
     
-    read(c_socket, (int)FileSize, sizeof(int));
-    encryptedFile = malloc(sizeof(char) * FileSize);
-    read(c_socket, (char *)&encryptedFile, sizeof(char) * FileSize);
-    read(c_socket, (char)hash, sizeof(char) * 128);
+    read(c_socket, (int *)FileSize, sizeof(int));
+    encryptedFile = malloc(sizeof(char) * *FileSize);
+    read(c_socket, (char *)&encryptedFile, sizeof(char) * *FileSize);
+    read(c_socket, (char *)hash, sizeof(char) * 128);
 
-    int segment = trunc(FileSize / atoi(argv[2]));
+    int segment = trunc(*FileSize / atoi(argv[2]));
     if (segment <= 0) segment = 1;
     int count = 0;
     
-    for (int i = 0; i < argv[2], i++;) {
-        if (i * segment >= FileSize) break;
+    for (int i = 0; i < atoi(argv[2]), i++;) {
+        if (i * segment >= *FileSize) break;
 
         message = fileSplit(encryptedFile, i * segment, atoi(argv[2]));        
         pipe(fd[i]);
@@ -54,7 +87,7 @@ int main (int argc, char *argv[]) {
     free(key);
     
     char *sharedMemory;
-    char *result = malloc(sizeof(char) * FileSize);
+    char *result = malloc(sizeof(char) * *FileSize);
     pid_t tempPID[4];
     int pidFound = 0;
     
@@ -78,7 +111,7 @@ int main (int argc, char *argv[]) {
     //hold hash
     uint32_t hashU[5];
 
-    sha1(encrypted, hashU);
+    sha1(encryptedFile, hashU);
     char hash_str[128];
     
     //store hashval in hash_str
@@ -87,29 +120,4 @@ int main (int argc, char *argv[]) {
     if (strcmp(hash_str, hash)) succeed(c_socket);
 
     failed (c_socket);
-}
-
-
-char *fileSplit(char *input, int pos, int size) {
-    int segment = trunc(0.5 + (strlen(input) / size));
-    char *result = malloc(sizeof(char) * segment);
-
-    for (int i = pos; i < segment; i++) {
-        if (i >= strlen(input)) break;
-        result[i - pos] = input[i];
-    }
-
-    return (result);
-}
-
-void failed (int c_socket) {
-    send(c_socket, 0, sizeof(int), 0);
-    close(c_socket);
-    exit (-1);
-}
-
-void success(int c_socket) {
-    send(c_socket, 1, sizeof(int), 0);
-    close(c_socket);
-    exit (0);
 }
