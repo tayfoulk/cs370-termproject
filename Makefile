@@ -1,6 +1,6 @@
 CXX=gcc
 #-Os optimizes for size, important for raspberry pi
-CXXFLAGS=-Os
+CXXFLAGS=
 #All dependencies for executables defined here
 DEPENDS=socket_conn.o sha1.o Encryption.o convert.o
 

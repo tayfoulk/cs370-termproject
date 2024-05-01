@@ -36,15 +36,15 @@ char* open_read_close(const char* filename, int* flen){
 //Desktop is the server
 /*
 	1: filename
-	if this needs to be changed to work do so
+	2: key
 	
 	Reads a file, sends the encrypted file data over
 	to the pi, then displays the result from the
 	raspberry pi.
 */
 int main(int argc, char **argv){
-	if(argc<=1){
-		printf("No filename provided. Ending execution\n");
+	if(argc<=2){
+		printf("Missing filename or key. Ending execution\n");
 		return 1;
 	}
 	
@@ -63,10 +63,13 @@ int main(int argc, char **argv){
 	ui32_to_char(myhash, hash_str);
 	
 	//encrypt file
-	char*encrypted=encrypt(filedat, "idkwhatthekeyis");
+	char*encrypted=encrypt(filedat, argv[2]);
 	//printf("Encrypted contents:\n\n%s\n\n", encrypted);
 	//convert encrypted file length to char pointer
 	flen=(int)strlen(encrypted);
+	encrypted[flen]='\0';
+	//+1 to force include null character
+	flen++;
 	sprintf(filesize, "%d", flen);
 	
 	//set up client connection
