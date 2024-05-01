@@ -70,18 +70,23 @@ int main (int argc, char *argv[]) {
     int shmid[atoi(argv[2])];
 
     int c_socket = makeClientSocket(argv[1]);
-    read_from_mifare_classic()
+    read_from_mifare_classic();
+    //store filesize of readdata.txt
+    int flen;
     
     char *encryptedFile; 
     char *key = open_read_close("./readdata.txt", &flen); // = key recieved from rfid reader
-    char *hash;
-    int* FileSize;
+    char hash[128];
+    int FileSize;
     char *message;
+    //for reading in filesize
+    char buffer[8];
     
-    read(c_socket, (int *)FileSize, sizeof(int));
-    encryptedFile = malloc(sizeof(char) * *FileSize);
-    read(c_socket, (char *)&encryptedFile, sizeof(char) * *FileSize);
-    read(c_socket, (char *)hash, sizeof(char) * 128);
+    read(c_socket, buffer, 8);
+    FileSize=atoi(buffer);
+    encryptedFile = (char*)malloc(sizeof(char) * FileSize);
+    read(c_socket, encryptedFile, sizeof(char) * *FileSize);
+    read(c_socket, hash, sizeof(char) * 128);
 
     int segment = trunc(*FileSize / atoi(argv[2]));
     if (segment % 10 != 0) segment -= segment % 10;

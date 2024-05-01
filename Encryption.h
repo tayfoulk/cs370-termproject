@@ -8,4 +8,4 @@ char* append(char*, char);
 char shiftKeyUp(char, char);
 char shiftKeyDown(char, char);
 char *shuffle(char *);
-char *decrypt(char *, char*);
+char *decrypt(char *, char*, int);
