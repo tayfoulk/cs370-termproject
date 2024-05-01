@@ -72,7 +72,7 @@ int main (int argc, char *argv[]) {
             exit(-1);
         } else if (pid[i] == 0) {
             char buffer[8];
-            execlp("./Consumer", "Consumer", buffer, fileSplit(encryptedFile, i * segment, atoi(argv[2])) /* rfid call*/ , hash, NULL);
+            execlp("./Consumer", "Consumer", buffer, fileSplit(encryptedFile, i * segment, atoi(argv[2])) /* rfid call*/ , hash, i * segment, NULL);
         } else {
             close(fd[i][0]);
             shmid[i] = shmget(IPC_PRIVATE, sizeof(char) * segment, IPC_CREAT | 0666);
