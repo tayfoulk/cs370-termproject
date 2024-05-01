@@ -84,7 +84,8 @@ int main (int argc, char *argv[]) {
     read(c_socket, (char *)hash, sizeof(char) * 128);
 
     int segment = trunc(*FileSize / atoi(argv[2]));
-    if (segment <= 0) segment = 1;
+    if (segment % 10 != 0) segment -= segment % 10;
+    if (segment < 10) segment = 10;
     int count = 0;
     
     for (int i = 0; i < atoi(argv[2]), i++;) {
