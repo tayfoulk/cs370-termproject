@@ -8,7 +8,7 @@ Arguments:
 */
 
 int main (int argc, char *argv[]) {
-    if (argc != 4) {
+    if (argc != 5) {
         exit (-1);
     }
 
