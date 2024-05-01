@@ -5,6 +5,31 @@
 2. Number of threads
 */
 
+char* read_file(FILE* file, int* flen){
+	fseek(file, 0L, SEEK_END);
+	//save file size to flen address
+	*flen=ftell(file);
+	char* data=(char*)malloc((*flen)+1);
+	rewind(file);
+	//printf("%d\n", flen);
+	uint32_t valread=fread(data, sizeof(char), *flen, file);
+	return data;
+}
+
+char* open_read_close(const char* filename, int* flen){
+	//file handling
+	FILE* file;
+	file=fopen(filename, "r");
+	if(file==NULL){
+		printf("Unable to open file \"%s\": File may not exist, or is lacking permission\n", filename);
+		exit(1);
+		return NULL;
+	}
+	char* data=read_file(file, flen);
+	fclose(file);
+	return data;
+}
+
 char *fileSplit(char *input, int pos, int size) {
     int segment = trunc(0.5 + (strlen(input) / size));
     char *result = malloc(sizeof(char) * segment);
@@ -45,9 +70,10 @@ int main (int argc, char *argv[]) {
     int shmid[atoi(argv[2])];
 
     int c_socket = makeClientSocket(argv[1]);
-
+    read_from_mifare_classic()
+    
     char *encryptedFile; 
-    char *key; // = key recieved from rfid reader
+    char *key = open_read_close("./readdata.txt", &flen); // = key recieved from rfid reader
     char *hash;
     int* FileSize;
     char *message;
