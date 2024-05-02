@@ -1,5 +1,21 @@
 #include "Producer.h"
+#include <stdio.h>
+#include <math.h>
 
+//shared memory
+#include <sys/shm.h>
+#include <unistd.h>
+#include <stdint.h>
+#include <sys/types.h> 
+#include <sys/wait.h>
+#include <sys/socket.h>
+
+// our headers
+#include "Encryption.c"
+#include "convert.c"
+#include "sha1.c"
+#include "socket_conn.c"
+#include "mifareReader.c"
 /* arguments
 1. IP address
 2. Number of threads
@@ -77,14 +93,14 @@ int main (int argc, char *argv[]) {
     char *encryptedFile; 
     char *key = open_read_close("./readdata.txt", &flen); // = key recieved from rfid reader
     char hash[128];
-    int FileSize;
+    int *FileSize;
     char *message;
     //for reading in filesize
     char buffer[8];
     
     read(c_socket, buffer, 8);
-    FileSize=atoi(buffer);
-    encryptedFile = (char*)malloc(sizeof(char) * FileSize);
+    *FileSize=atoi(buffer);
+    encryptedFile = (char*)malloc(sizeof(char) * *FileSize);
     read(c_socket, encryptedFile, sizeof(char) * *FileSize);
     read(c_socket, hash, sizeof(char) * 128);
 
@@ -104,7 +120,7 @@ int main (int argc, char *argv[]) {
             exit(-1);
         } else if (pid[i] == 0) {
             char buffer[8];
-            execlp("./Consumer", "Consumer", buffer, fileSplit(encryptedFile, i * segment, atoi(argv[2])) /* rfid call*/ , hash, i * segment, NULL);
+            execlp("./Consumer", "Consumer", buffer, fileSplit(encryptedFile, i * segment, atoi(argv[2])) /* rfid call*/ , i * segment, NULL);
         } else {
             close(fd[i][0]);
             shmid[i] = shmget(IPC_PRIVATE, sizeof(char) * segment, IPC_CREAT | 0666);

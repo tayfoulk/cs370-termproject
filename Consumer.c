@@ -19,7 +19,7 @@ int main (int argc, char *argv[]) {
 
     strcpy (encrypted, argv[2]);
 
-    encrypted = decrypt(encrypted, argv[3], atoi(argv[4]);
+    encrypted = decrypt(encrypted, argv[3], atoi(argv[4]));
 
     uint32_t valread=read(fd, &shmid, sizeof(shmid));
     answer = (char*)shmat(shmid, NULL, 0);
